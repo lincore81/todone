@@ -1,5 +1,5 @@
 import { gradientInteraction } from "@/app/theme";
-import { $ } from "@/app/util";
+import { classes } from "@/app/util";
 import { ButtonHTMLAttributes, FunctionComponent } from "react";
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -10,7 +10,7 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 const Button: FunctionComponent<ButtonProps> = (props) => 
   <button 
     {...props}
-    className={$(
+    className={classes(
       "py-1",
       props?.disabled && "grayscale opacity-50",
       props?.kind === "primary" && gradientInteraction,

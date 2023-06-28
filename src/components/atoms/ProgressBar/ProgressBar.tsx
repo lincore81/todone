@@ -1,5 +1,5 @@
 import { FunctionComponent, HTMLAttributes } from "react";
-import { $ } from "@/app/util";
+import { classes } from "@/app/util";
 
 export type ProgressBarProps = {
   progress: number,
@@ -12,10 +12,10 @@ const ProgressBar: FunctionComponent<ProgressBarProps> = props => {
     ? (props.progress / props.maxProgress)
     : props.progress) * 100);
   return (
-    <div className={$("border border-white rounded-full", props.className)}>
+    <div className={classes("border border-white rounded-full", props.className)}>
       <div 
         style={{width: `${percent}%`}}
-        className={$("box-border h-full bg-white rounded-full" , props?.innerClassName)}
+        className={classes("box-border h-full bg-white rounded-full" , props?.innerClassName)}
       >
         {props.children}
       </div>

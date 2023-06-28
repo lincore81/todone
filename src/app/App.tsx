@@ -24,11 +24,11 @@ function App() {
   return (
     <main className="flex flex-col mx-auto mt-8 max-md:px-4 md:w-1/2 gap-8 content-center items-center">
       <AddTodo />
-      { notDone.length ? <TodoList todos={notDone} />
+      { notDone.length ? <TodoList todos={notDone} id="not-done" />
       : done.length ? <AllDone />
       : <p>Add a task to start.</p>
       }
-      <TodoList todos={done} />
+      <TodoList todos={done} id="done" />
       <ProgressBar 
         progress={progress} 
         className="w-full h-4 p-1 border-opacity-75" 

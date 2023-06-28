@@ -7,7 +7,7 @@ import Card from "@components/atoms/Card/Card";
 import Button from "@/components/atoms/Button/Button";
 import Checkbox from "@/components/atoms/Checkbox/Checkbox";
 import { Todo, remove, setDescription, setDone } from "@features/todo/slice";
-import { $ } from "@/app/util";
+import { classes } from "@/app/util";
 
 export type TodoItemProps = { todo: Todo }
 
@@ -29,7 +29,7 @@ const TodoItem: FunctionComponent<TodoItemProps> = ({todo}) => {
     stopEditing();
   };
   return (
-    <Card className={$("group flex pl-0 py-2 items-center", !!todo.done && "opacity-70")}>
+    <Card className={classes("group flex pl-0 py-2 items-center", !!todo.done && "opacity-70")}>
       <DotsSixVertical className="mx-1 cursor-pointer" />
       <Checkbox 
         checked={!!todo.done}
@@ -53,6 +53,7 @@ const TodoItem: FunctionComponent<TodoItemProps> = ({todo}) => {
 };
 
 
+
 type OnItemChecked = (dispatch: ReturnType<typeof useDispatch>, todo: Todo) 
   => (checked: boolean) => void;
 
@@ -68,7 +69,7 @@ const Label: FunctionComponent<HTMLAttributes<HTMLLabelElement>> = (props) => {
   return (
     <label 
       {...props}
-      className={$("flex-1 cursor-pointer text-left", props.className)}
+      className={classes("flex-1 cursor-pointer text-left", props.className)}
     > {props.children} </label>
   );
 };

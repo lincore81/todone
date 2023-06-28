@@ -2,7 +2,7 @@ import { Dispatch, FormEventHandler, FunctionComponent, SetStateAction, useState
 import { useDispatch } from "react-redux";
 import { add } from "../../slice";
 import Button from "@/components/atoms/Button/Button";
-import { $ } from "@/app/util";
+import { classes } from "@/app/util";
 import { Plus } from "@phosphor-icons/react";
 
 const AddTodo: FunctionComponent = () => { 
@@ -26,7 +26,7 @@ const AddTodo: FunctionComponent = () => {
       kind="tool" 
       type="submit" 
       disabled={invalid}
-      className={$(
+      className={classes(
         invalid && "hidden",
         "absolute w-10 right-0 top-0 bottom-0 bg-white text-black rounded-md"
       )}
