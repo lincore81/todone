@@ -15,7 +15,7 @@ export type Todo = {
 };
 
 
-export type TodoState = Todo[];
+export type TodoState = {[key: string]: Todo[]};
 
 export const makeTodo = (description: string): Todo => ({
   description,
@@ -24,35 +24,50 @@ export const makeTodo = (description: string): Todo => ({
   timeWorkedOn: 0,
 });
 
-const initialState: TodoState = [
-  makeTodo("Buy groceries"),
-  makeTodo("Make dentist appointment"),
-  makeTodo("Have dinner"),
-];
+const initialState: TodoState = {
+  default: [ ],
+  done: [ ],
+};
+
+const getTodo = (state: TodoState, uuid: string) => {
+  const buckets = Object.values(state);
+  const todos = ([] as Todo[]).concat(...buckets);
+  return todos?.find(({id}) => id === uuid);
+};
+
+const getTodoLocation = (state: TodoState, uuid: string): [string|undefined, number] => {
+  const bucket = Object.entries(state).find(([_, v]) => v.find(x => x.id === uuid));
+  return bucket
+    ? [bucket[0], bucket[1].findIndex(x => x.id === uuid)]
+    : [undefined, -1];
+};
+
 
 export const todoSlice = createSlice({
   name: 'todo',
   initialState,
   reducers: {
-    add: (state, action: PayloadAction<string>) => {
-      state.push(makeTodo(action.payload));
+    add: (state, action: PayloadAction<{bucket: string, description: string}>) => {
+      state[action.payload.bucket]?.push(makeTodo(action.payload.description));
     },
     remove: (state, action: PayloadAction<string>) => {
-      const index = state.findIndex(x => x.id === action.payload);
-      if (index >= 0) {
-        state.splice(index, 1);
+      const [name, index] = getTodoLocation(state, action.payload);
+      if (name && index >= 0) {
+        state[name].splice(index, 1);
       }
     },
-    setDone: (state, action: PayloadAction<{uuid: string, done: boolean}>) => {
-      const todo = state.find(({id}) => id === action.payload.uuid);
+    setDone: (state, action: PayloadAction<{id: string, done: boolean}>) => {
+      const todo = getTodo(state, action.payload.id);
       if (todo) todo.done = action.payload.done ? Date.now() : false;
     },
-    setDescription: (state, action: PayloadAction<{uuid: string, description: string}>) => {
-      const todo = state.find(({id}) => id === action.payload.uuid);
+    setDescription: (state, action: PayloadAction<{id: string, description: string}>) => {
+      const todo = getTodo(state, action.payload.id);
       if (todo) todo.description = action.payload.description;
     },
-    move: (state, action: PayloadAction<{fromIndex: number, toIndex: number}>) => {
-      moveInArray(state, action.payload.fromIndex, action.payload.toIndex);
+    move: (state, action: PayloadAction<{bucket: string, fromIndex: number, toIndex: number}>) => {
+      const bucket = state[action.payload.bucket];
+      if (bucket)
+        moveInArray(bucket, action.payload.fromIndex, action.payload.toIndex);
     },
   },
 });

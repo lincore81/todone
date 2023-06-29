@@ -31,7 +31,7 @@ const EditableLabel: FunctionComponent<EditableLabelProps> = (props) => {
   const onChangeHandler: ChangeEventHandler<HTMLInputElement> = (e) => {
     props?.onChange?.(e.currentTarget.value);
   };
-  const classes = "flex items-stretch"
+  const classes = "flex items-stretch";
 
   return !props.canEdit 
     ? <Label text={props.text} />

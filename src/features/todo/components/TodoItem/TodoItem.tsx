@@ -1,7 +1,6 @@
 import { FormEventHandler, FunctionComponent, HTMLAttributes, useState } from "react";
 import { useDispatch } from 'react-redux';
 import { DotsSixVertical, PencilSimpleLine, PencilSimpleSlash, Trash } from "@phosphor-icons/react";
-import { v4 as uuid } from "uuid";
 
 import Card from "@components/atoms/Card/Card";
 import Button from "@/components/atoms/Button/Button";
@@ -25,7 +24,7 @@ const TodoItem: FunctionComponent<TodoItemProps> = ({todo}) => {
   const dispatch = useDispatch();
   const stopEditing = () => setIsEditing(false);
   const submit = () => {
-    dispatch(setDescription({uuid: uuid(), description: value}));
+    dispatch(setDescription({id: todo.id, description: value}));
     stopEditing();
   };
   return (
@@ -59,7 +58,7 @@ type OnItemChecked = (dispatch: ReturnType<typeof useDispatch>, todo: Todo)
 
 const onItemChecked: OnItemChecked = (dispatch, todo) => (checked: boolean) => {
   dispatch(setDone({
-    uuid: todo.id,
+    id: todo.id,
     done: checked
   }));
 };

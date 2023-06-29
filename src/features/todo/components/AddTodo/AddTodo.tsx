@@ -5,6 +5,8 @@ import Button from "@/components/atoms/Button/Button";
 import { classes } from "@/app/util";
 import { Plus } from "@phosphor-icons/react";
 
+const ADD_TO_BUCKET = "default";
+
 const AddTodo: FunctionComponent = () => { 
   const [value, setValue] = useState("");
   const dispatch = useDispatch();
@@ -44,7 +46,7 @@ type OnSubmitFunction = (
 const onSubmit: OnSubmitFunction = (dispatch, value, setValue) => e => {
   e.preventDefault();
   if (value.trim()) {
-    dispatch(add(value));
+    dispatch(add({bucket: ADD_TO_BUCKET, description: value}));
     setValue("");
   }
 };

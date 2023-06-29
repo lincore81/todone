@@ -7,36 +7,44 @@ import usePropState from "@/app/hooks/usePropState";
 
 export type TodoListProps = {
   todos: Todo[],
-  id: string|number,
+  bucket: string,
 }
 
 
 const DROPPER = "dropper";
 
 
-const TodoList: FunctionComponent<TodoListProps> = ({todos, id}) => {
+const TodoList: FunctionComponent<TodoListProps> = ({todos, bucket}) => {
   const dispatch = useDispatch();
   const [state, setState] = usePropState<(Todo|typeof DROPPER)[]>(todos);
   const [placeholderIndex, setPlaceholderIndex] = useState<number|undefined>(undefined);
   const [dragIndex, setDragIndex] = useState<number|undefined>(undefined);
-
+  const isDraggingUp = typeof dragIndex === "number" 
+    && typeof placeholderIndex === "number" && dragIndex > placeholderIndex;
   useEffect(() => { 
-    placeholderIndex === undefined 
-    || placeholderIndex === dragIndex 
-    ? todos
-    : setState(inserted<Todo|typeof DROPPER>(todos, DROPPER, placeholderIndex));
-  }, [todos, placeholderIndex, setState, dragIndex]);
+    if ( placeholderIndex === undefined 
+      || placeholderIndex === dragIndex
+      || !isDraggingUp 
+          && typeof dragIndex === "number" 
+          && placeholderIndex < state.length - 1 
+          && placeholderIndex - dragIndex === 1
+      ) return;
+    setState(inserted<Todo|typeof DROPPER>(todos, DROPPER, placeholderIndex));
+  }, [todos, placeholderIndex, setState, dragIndex, isDraggingUp, state?.length]);
 
   return <ul 
     className="flex flex-col gap-4 w-full items-stretch">
     {state.map((t, i) => t === DROPPER
       ? <DndPlaceholder key={i} 
-        onDrop={() => dispatch(move({fromIndex: dragIndex ?? 0, toIndex: i}))} />
+        onDrop={() => {
+          const toIndex = isDraggingUp ? i : i - 1;
+          dispatch(move({bucket, fromIndex: dragIndex ?? 0, toIndex}));
+        }} />
       : <DndTodoItem 
-        todo={t} index={i} key={t.id} listId={id}
+        todo={t} index={i} key={t.id} bucket={bucket}
         onDragStart={setDragIndex} 
         onDragOver={setPlaceholderIndex}
-        onDragEnd={() => {setDragIndex(undefined); setPlaceholderIndex(undefined);}}
+        onDragEnd={() => {setDragIndex(undefined); setPlaceholderIndex(undefined); setState(todos);}}
       />
     )}
   </ul>;
@@ -49,26 +57,25 @@ export default TodoList;
 type DndTodoItemProps = {
   todo: Todo,
   index: number,
-  listId: number|string,
+  bucket: string,
   onDragOver: (overIndex: number) => void,
   onDragStart: (index: number) => void,
   onDragEnd: () => void,
 }
 
 const DndTodoItem: FunctionComponent<DndTodoItemProps> = (props) => {
-  const {todo, listId, index, onDragOver, onDragStart, onDragEnd } = props;
+  const {todo, bucket, index, onDragOver, onDragStart, onDragEnd } = props;
   return (
     <li 
       draggable 
       onDragEnter={e => {
-        if (e.dataTransfer.getData("text/plain") == listId) {
+        if (e.dataTransfer.getData("text/plain") === bucket) {
           e.preventDefault();
           onDragOver(index);
         }
       }}
       onDragStart={e => {
-        e.dataTransfer.setData("text/plain", String(listId));
-        console.log("Dragging item from list:", listId);
+        e.dataTransfer.setData("text/plain", bucket);
         onDragStart(index);
       }}
       onDragEnd={onDragEnd}
