@@ -11,7 +11,7 @@ const Button: FunctionComponent<ButtonProps> = (props) =>
   <button 
     {...props}
     className={classes(
-      "py-1",
+      "py-1 flex flex-row items-center gap-1",
       props?.disabled && "grayscale opacity-50",
       props?.kind === "primary" && gradientInteraction,
       props?.kind === "primary" && "text-gray-800 rounded-lg shadow-md hover:shadow-lg px-4",

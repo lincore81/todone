@@ -10,10 +10,11 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Manrope", defaultTheme.fontFamily.sans]
+        sans: ["Manrope", defaultTheme.fontFamily.sans],
+        digits: ['"Unica One"', "Manrope", defaultTheme.fontFamily.sans]
       }
     },
   },
   plugins: [],
-}
+};
 

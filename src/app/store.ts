@@ -1,5 +1,6 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import todoReducer from "../features/todo/slice";
+import todoReducer from "@/features/todo/slice";
+import trackerReducer from "@/features/tracker/slice";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import thunk from "redux-thunk";
@@ -7,6 +8,7 @@ import thunk from "redux-thunk";
 const persistConfig = { key: 'root', storage, };
 const rootReducer = combineReducers({ 
   todo: todoReducer,
+  tracker: trackerReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

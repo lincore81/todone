@@ -1,4 +1,4 @@
-import { FormEventHandler, FunctionComponent, HTMLAttributes, useState } from "react";
+import { FormEventHandler, FunctionComponent, HTMLAttributes, useMemo, useState } from "react";
 import { useDispatch } from 'react-redux';
 import { DotsSixVertical, PencilSimpleLine, PencilSimpleSlash, Trash } from "@phosphor-icons/react";
 
@@ -6,9 +6,9 @@ import Card from "@components/atoms/Card/Card";
 import Button from "@/components/atoms/Button/Button";
 import Checkbox from "@/components/atoms/Checkbox/Checkbox";
 import { Todo, remove, setDescription, setDone } from "@features/todo/slice";
-import { classes } from "@/app/util";
+import { classes, formatTime, getHumanisedTimestr } from "@/app/util";
 
-export type TodoItemProps = { todo: Todo }
+export type TodoItemProps = { todo: Todo, isTimeTracked: boolean }
 
 type EditLabelProps = {
   value: string,
@@ -18,7 +18,7 @@ type EditLabelProps = {
 }
 
 
-const TodoItem: FunctionComponent<TodoItemProps> = ({todo}) => {
+const TodoItem: FunctionComponent<TodoItemProps> = ({todo, isTimeTracked}) => {
   const [value, setValue] = useState(todo.description);
   const [isEditing, setIsEditing] = useState(false);
   const dispatch = useDispatch();
@@ -27,8 +27,10 @@ const TodoItem: FunctionComponent<TodoItemProps> = ({todo}) => {
     dispatch(setDescription({id: todo.id, description: value}));
     stopEditing();
   };
+  const timeStr = useMemo(() => getHumanisedTimestr(todo.timeWorkedOn), [todo]);
+  const tooltip = useMemo(() => formatTime(todo.timeWorkedOn), [todo]);
   return (
-    <Card className={classes("group flex pl-0 py-2 items-center", !!todo.done && "opacity-70")}>
+    <Card className={classes("group flex pl-0 py-2 items-center")}>
       <DotsSixVertical className="mx-1 cursor-pointer" />
       <Checkbox 
         checked={!!todo.done}
@@ -37,6 +39,15 @@ const TodoItem: FunctionComponent<TodoItemProps> = ({todo}) => {
       >
         <Label className={isEditing ? "sr-only w-0" : ""}>
           {todo.description}
+          {todo.timeWorkedOn >= 900 && 
+            <span
+              className={classes("ml-2 px-2 rounded-full text-gray-500 border ", 
+                isTimeTracked ? "border-rose-500" : "border-gray-300")}
+              style={{width: `${timeStr.length+2}ch`}}
+              title={tooltip}
+            >
+              {todo.done ? tooltip : timeStr}
+            </span>}
         </Label>
       </Checkbox>
       { isEditing
@@ -59,7 +70,8 @@ type OnItemChecked = (dispatch: ReturnType<typeof useDispatch>, todo: Todo)
 const onItemChecked: OnItemChecked = (dispatch, todo) => (checked: boolean) => {
   dispatch(setDone({
     id: todo.id,
-    done: checked
+    done: checked,
+    move: true
   }));
 };
 
@@ -69,7 +81,7 @@ const Label: FunctionComponent<HTMLAttributes<HTMLLabelElement>> = (props) => {
     <label 
       {...props}
       className={classes("flex-1 cursor-pointer text-left", props.className)}
-    > {props.children} </label>
+    >{props.children}</label>
   );
 };
 

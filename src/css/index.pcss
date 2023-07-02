@@ -9,8 +9,17 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 }
+
 body {
-  background: linear-gradient(265deg, #991b1b, #c2410c, #073685, #4c1d95, #831843);
+  background: linear-gradient(265deg, #991b1b, #c2410c, #831843);
+  background-size: 1000% 1000%;
+  -webkit-animation: Lavalamp 120s ease infinite;
+  -moz-animation: Lavalamp 120s ease infinite;
+  animation: Lavalamp 120s ease infinite;
+}
+
+body.break {
+  background: linear-gradient(265deg, #32670c, #073685, #4c1d95);
   background-size: 1000% 1000%;
   -webkit-animation: Lavalamp 120s ease infinite;
   -moz-animation: Lavalamp 120s ease infinite;
@@ -35,10 +44,17 @@ body {
 
 @font-face {
   font-family: "Manrope";
-  src: url("src/assets/manrope.woff2") format("woff2 supports variations"),
-       url("src/assets/manrope.woff2") format("woff2-variations");
+  src: url("src/assets/fonts/manrope.woff2") format("woff2 supports variations"),
+       url("src/assets/fonts/manrope.woff2") format("woff2-variations");
   font-weight: 100 1000;
 }
+
+@font-face {
+  font-family: "Unica One";
+  src: url("src/assets/fonts/unicaone.ttf") format("truetype");
+}
+
+
 
 li {
   list-style: none;

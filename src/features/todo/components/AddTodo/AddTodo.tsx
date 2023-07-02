@@ -19,7 +19,9 @@ const AddTodo: FunctionComponent = () => {
     <input 
       type="text" 
       value={value} 
-      className="pr-10 flex-1 rounded-md border border-white bg-transparent text-white placeholder:italic text-center placeholder:text-center placeholder:text-sm placeholder:text-white"
+      className={classes(`flex-1 rounded-md border border-white bg-transparent text-white 
+        placeholder:italic text-center placeholder:text-center placeholder:text-sm placeholder:text-white`,
+        !invalid && "pr-10")}
       placeholder="Enter a new task"
       aria-label="Task description"
       onChange={e => setValue(e.currentTarget.value)}
