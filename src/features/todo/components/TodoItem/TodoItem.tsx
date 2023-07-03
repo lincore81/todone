@@ -22,7 +22,10 @@ const TodoItem: FunctionComponent<TodoItemProps> = ({todo, isTimeTracked, setEdi
   const [value, setValue] = useState(todo.description);
   const [isEditing, setIsEditing] = useState(false);
   const dispatch = useDispatch();
-  const stopEditing = () => setIsEditing(false);
+  const stopEditing = () => {
+    setIsEditing(false);
+    setEditing(false);
+  };
   const submit = () => {
     dispatch(setDescription({id: todo.id, description: value}));
     stopEditing();
