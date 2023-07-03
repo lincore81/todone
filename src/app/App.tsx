@@ -14,6 +14,7 @@ import Config from "@/components/molecules/Config/Config";
 function App() {
   return (
     <main className={classes( "flex flex-col max-w-full min-w-[360px] lg:min-w-[560px] w-max mt-8 max-md:px-4 gap-8 content-center items-center")}>
+      <span className="hidden font-digits"></span>
       <Config />
       <AddTodo />
       <Tracker />

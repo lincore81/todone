@@ -1,11 +1,29 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import todoReducer from "@/features/todo/slice";
-import trackerReducer from "@/features/tracker/slice";
-import { persistStore, persistReducer } from "redux-persist";
+import trackerReducer, { TrackerState } from "@/features/tracker/slice";
+import { persistStore, persistReducer, createTransform } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import thunk from "redux-thunk";
 
-const persistConfig = { key: 'root', storage, };
+const pauseTransform: any = createTransform<unknown, any, RootState>(
+  // serialise
+  (state: unknown, _: string|number|symbol) => state,
+  // deserialise
+  (state: TrackerState, key: string|number|symbol) => {
+    return key === "tracker" ? {
+      ...state,
+      mode: state.mode === "running" ? "paused" : state.mode
+    } : state;
+  },
+  {whitelist: ['tracker']}
+);
+
+
+const persistConfig = { 
+  key: 'root', 
+  storage, 
+  transforms: [pauseTransform]
+};
 const rootReducer = combineReducers({ 
   todo: todoReducer,
   tracker: trackerReducer,
