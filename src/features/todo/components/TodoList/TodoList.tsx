@@ -25,6 +25,7 @@ const TodoList: FunctionComponent<TodoListProps> = ({bucket}) => {
   const isDraggingUp = typeof dragIndex === "number" 
     && typeof placeholderIndex === "number" && dragIndex > placeholderIndex;
   const timeTrackedIndex = useMemo(() => todos.findIndex(t => !t.done), [todos]);
+  const isTracking = tracker.addBreakTimeToTask || tracker.mode === "running" && tracker.phase === "work";
   useEffect(() => { 
     if ( placeholderIndex === undefined 
       || placeholderIndex === dragIndex
@@ -51,7 +52,7 @@ const TodoList: FunctionComponent<TodoListProps> = ({bucket}) => {
         onDragStart={setDragIndex} 
         onDragOver={setPlaceholderIndex}
         onDragEnd={() => {setDragIndex(undefined); setPlaceholderIndex(undefined); setState(todos);}}
-        isTimeTracked={tracker.mode === "running" && i === timeTrackedIndex}
+        isTimeTracked={isTracking && tracker.mode === "running" && i === timeTrackedIndex}
       />
     )}
   </ul>;
@@ -73,9 +74,10 @@ type DndTodoItemProps = {
 
 const DndTodoItem: FunctionComponent<DndTodoItemProps> = (props) => {
   const {todo, bucket, index, onDragOver, onDragStart, onDragEnd, isTimeTracked } = props;
+  const [isEditing, setIsEditing] = useState(false);
   return (
     <li 
-      draggable 
+      draggable={!isEditing}
       onDragEnter={e => {
         if (e.dataTransfer.getData("text/plain") === bucket) {
           e.preventDefault();
@@ -88,7 +90,7 @@ const DndTodoItem: FunctionComponent<DndTodoItemProps> = (props) => {
       }}
       onDragEnd={onDragEnd}
     >
-      <TodoItem todo={todo} isTimeTracked={isTimeTracked}/>
+      <TodoItem todo={todo} isTimeTracked={isTimeTracked} setEditing={setIsEditing}/>
     </li>
   );
 };

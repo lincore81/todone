@@ -1,23 +1,37 @@
-import { MINUTE } from '@/app/util';
+import { MINUTE, SECOND } from '@/app/util';
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
 type Phase = "work" | "break";
 
-export type TrackerState = {
+export type TrackerState = { 
+  workTime: number,
+  breakTime: number,
+  addBreakTimeToTask: boolean,
+  playAudio: boolean,
+  simpleButtons: boolean,
+} & ({
   mode: "stopped" 
 } | {
   mode: "running" | "paused"
   phase: "work" | "break"
   timeLeft: number,
   workSegmentsCompleted: number,
-}
+});
 
 export const getNextPhase = (phase?: Phase) => phase === "work" ? "break" : "work";
-export const getPhaseTime = (phase?: Phase) => (phase === "work" ? 25 : 5) * MINUTE;
+export const getPhaseTime = (state: TrackerState, phase?: Phase) => 
+  phase === "work"
+    ? state.workTime
+    : state.breakTime;
 
 const initialState: TrackerState = {
-  mode: "stopped"
+  mode: "stopped",
+  simpleButtons: true,
+  addBreakTimeToTask: true,
+  playAudio: true,
+  workTime: 25 * MINUTE,
+  breakTime: 5 * MINUTE
 };
 
 
@@ -34,15 +48,37 @@ export const trackerSlice = createSlice({
         : {
           ...state, 
           phase: next, 
-          timeLeft: getPhaseTime(next),
+          timeLeft: getPhaseTime(state, next),
           workSegmentsCompleted: state.workSegmentsCompleted + (state.phase === "work" ? 1 : 0)
         };
     },
+    prevPhase: (state) => {
+      if (state.mode === "stopped") return state;
+      const totalTime = getPhaseTime(state, state.phase);
+      if (totalTime - state.timeLeft > 30 * SECOND) {
+        return {...state, timeLeft: getPhaseTime(state, state.phase)};
+      } else {
+        const phase = getNextPhase(state.phase);
+        return {
+          ...state, 
+          phase,
+          timeLeft: getPhaseTime(state, phase),
+          mode: "running"
+        };
+      }
+    },
     nextPhase: (state) => {
       if (state.mode === "stopped") return state;
-      state.phase = getNextPhase(state.phase);
-      state.timeLeft = getPhaseTime(state.phase);
-      state.mode = "running";
+      const phase = getNextPhase(state.phase);
+      const phaseTime = getPhaseTime(state, state.phase);
+      const earnedNotch = state.phase === "work" && (phaseTime ? (phaseTime - state.timeLeft) / phaseTime : 0) > 0.5;
+      return {
+        ...state,
+        phase,
+        timeLeft: getPhaseTime(state, phase),
+        mode: "running",
+        workSegmentsCompleted: state.workSegmentsCompleted + (earnedNotch? 1 : 0)
+      };
     },
     togglePause: (state) => {
       state.mode = state.mode === "paused" ? "running" : "paused";
@@ -52,14 +88,49 @@ export const trackerSlice = createSlice({
         ...state,
         mode: "running",
         phase: "work",
-        timeLeft: getPhaseTime("work"),
-        workSegmentsCompleted: 0
+        timeLeft: getPhaseTime(state, "work"),
+        workSegmentsCompleted: 0,
+        workTime: state.workTime || 25*1000,
+        breakTime: state.breakTime || 5 * 1000
       };
     },
-    stop: () => initialState
+    stop: () => initialState,
+    configureWorkTime: (state, action: PayloadAction<number>) => {
+      if (0 <= action.payload && isFinite(action.payload)) {
+        return { ...state, workTime: action.payload};
+      } else {
+        return state;
+      }
+    },
+    configureBreakTime: (state, action: PayloadAction<number>) => {
+      if (0 <= action.payload && isFinite(action.payload)) {
+        return { ...state, breakTime: action.payload};
+      } else {
+        return state;
+      }
+    },
+    configureAddBreakTime: (state, action: PayloadAction<boolean>) => {
+      return { ...state, addBreakTimeToTask: action.payload};
+    },
+    configurePlayAudio: (state, action: PayloadAction<boolean>) => 
+      ({ ...state, playAudio: action.payload}),
+    configureSimpleButtons: (state, action: PayloadAction<boolean>) => 
+      ({ ...state, simpleButtons: action.payload}),
   },
 });
 
-export const {updateTimer, nextPhase, togglePause, start, stop} = trackerSlice.actions;
+export const {
+  updateTimer, 
+  nextPhase, 
+  prevPhase, 
+  togglePause, 
+  start, 
+  stop,
+  configureBreakTime,
+  configureWorkTime,
+  configureAddBreakTime,
+  configurePlayAudio,
+  configureSimpleButtons,
+} = trackerSlice.actions;
 export type TrackerActions = keyof typeof trackerSlice.actions;
 export default trackerSlice.reducer;

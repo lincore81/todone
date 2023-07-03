@@ -4,7 +4,7 @@ import { ButtonHTMLAttributes, FunctionComponent } from "react";
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   label?: string,
-  kind?: "primary" | "secondary" | "tool",
+  kind?: "primary" | "secondary" | "tool" | "tracker",
 }; 
 
 const Button: FunctionComponent<ButtonProps> = (props) => 
@@ -16,6 +16,7 @@ const Button: FunctionComponent<ButtonProps> = (props) =>
       props?.kind === "primary" && gradientInteraction,
       props?.kind === "primary" && "text-gray-800 rounded-lg shadow-md hover:shadow-lg px-4",
       props?.kind === "tool" && "hover:text-rose-500 px-2",
+      props?.kind === "tracker" && "hover:invert",
       props.className
     )}
     aria-disabled={props.disabled ?? props["aria-disabled"]}

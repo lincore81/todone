@@ -8,7 +8,7 @@ import Checkbox from "@/components/atoms/Checkbox/Checkbox";
 import { Todo, remove, setDescription, setDone } from "@features/todo/slice";
 import { classes, formatTime, getHumanisedTimestr } from "@/app/util";
 
-export type TodoItemProps = { todo: Todo, isTimeTracked: boolean }
+export type TodoItemProps = { todo: Todo, isTimeTracked: boolean, setEditing: (_: boolean) => void }
 
 type EditLabelProps = {
   value: string,
@@ -18,7 +18,7 @@ type EditLabelProps = {
 }
 
 
-const TodoItem: FunctionComponent<TodoItemProps> = ({todo, isTimeTracked}) => {
+const TodoItem: FunctionComponent<TodoItemProps> = ({todo, isTimeTracked, setEditing}) => {
   const [value, setValue] = useState(todo.description);
   const [isEditing, setIsEditing] = useState(false);
   const dispatch = useDispatch();
@@ -31,7 +31,7 @@ const TodoItem: FunctionComponent<TodoItemProps> = ({todo, isTimeTracked}) => {
   const tooltip = useMemo(() => formatTime(todo.timeWorkedOn), [todo]);
   return (
     <Card className={classes("group flex pl-0 py-2 items-center")}>
-      <DotsSixVertical className="mx-1 cursor-pointer" />
+      <DotsSixVertical className={classes("mx-1 cursor-pointer", isEditing && "opacity-10")} />
       <Checkbox 
         checked={!!todo.done}
         onChange={onItemChecked(dispatch, todo)} 
@@ -42,7 +42,7 @@ const TodoItem: FunctionComponent<TodoItemProps> = ({todo, isTimeTracked}) => {
           {todo.timeWorkedOn >= 900 && 
             <span
               className={classes("ml-2 px-2 rounded-full text-gray-500 border ", 
-                isTimeTracked ? "border-rose-500" : "border-gray-300")}
+                isTimeTracked ? "border-rose-500 animate-pulse" : "border-gray-300")}
               style={{width: `${timeStr.length+2}ch`}}
               title={tooltip}
             >
@@ -55,7 +55,7 @@ const TodoItem: FunctionComponent<TodoItemProps> = ({todo, isTimeTracked}) => {
             <EditLabel value={value} setValue={setValue} submit={submit} cancel={stopEditing} />
             <CancelButton cancel={stopEditing} />
           </>
-        : <EditButton setIsEditing={setIsEditing} />
+        : <EditButton setIsEditing={b => {setIsEditing(b); setEditing(b);}} />
       }
       <RemoveButton todo={todo} />
     </Card>

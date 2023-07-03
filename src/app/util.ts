@@ -28,15 +28,15 @@ export const getHumanisedTimestr = (millis: number) => {
   const seconds = Math.floor((millis % MINUTE) / SECOND);
   const hoursStr = hours ? `${hours}h` : "";
   const minutesStr = minutes ? `${minutes}m` : "";
-  const secondsStr = minutes < 5 && seconds? `${seconds}s` : "";
+  const secondsStr = !hours && minutes < 5 && seconds? `${seconds}s` : "";
   return `${hoursStr}${minutesStr}${secondsStr}`;
 };
 
 export const formatTime = (timeMs: number) => {
   const hours = Math.floor(timeMs / HOUR);
   const minutes = Math.floor((timeMs - (hours * HOUR)) / MINUTE);
-  const seconds = Math.floor((timeMs - (minutes * MINUTE)) / SECOND);
+  const seconds = Math.floor((timeMs - (hours * HOUR + minutes * MINUTE)) / SECOND);
   const minutesStr = `${minutes < 10 ? "0" : ""}${minutes}`;
   const secondsStr = `${seconds < 10 ? "0" : ""}${seconds}`;
-  return `${hours? hours : ""}${minutesStr}:${secondsStr}`;
+  return `${hours? `${hours}:` : ""}${minutesStr}:${secondsStr}`;
 };
