@@ -1,7 +1,7 @@
 import { FunctionComponent, useState } from "react";
 
 import Button from "@components/atoms/Button/Button";
-import { GearSix, X } from "@phosphor-icons/react";
+import { GearSix, GithubLogo, X } from "@phosphor-icons/react";
 import { RootState } from "@/app/store";
 import { useDispatch, useSelector } from "react-redux";
 import { MINUTE, classes } from "@/app/util";
@@ -73,7 +73,13 @@ const ConfigModal: FunctionComponent<{visible: boolean, setVisible: (_:boolean) 
 const Config: FunctionComponent = () => {
   const [isShowing, setIsShowing] = useState(false);
   return <div>
-    <div className="fixed right-2 top-2 z-30">
+    <div className="fixed right-2 top-2 z-30 flex flex-row">
+      <Button 
+        kind="tool" 
+        aria-label="Github repository" 
+        className="hover:invert scale-125 hover:scale-150"
+        onClick={() => window.open("https://github.com/lincore81/todone", "_blank")}
+      > <GithubLogo /> </Button>
       <Button 
         kind="tool" 
         aria-label="Configure" 
