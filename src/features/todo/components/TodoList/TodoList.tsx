@@ -48,7 +48,7 @@ const TodoList: FunctionComponent<TodoListProps> = ({bucket}) => {
           dispatch(move({bucket, fromIndex: dragIndex ?? 0, toIndex}));
         }} />
       : <DndTodoItem 
-        todo={t} index={i} key={t.id} bucket={bucket}
+        todo={t} index={i} key={t.id} mayDrop={dragIndex !== undefined}
         onDragStart={setDragIndex} 
         onDragOver={setPlaceholderIndex}
         onDragEnd={() => {setDragIndex(undefined); setPlaceholderIndex(undefined); setState(todos);}}
@@ -65,27 +65,24 @@ export default TodoList;
 type DndTodoItemProps = {
   todo: Todo,
   index: number,
-  bucket: string,
   isTimeTracked: boolean,
+  mayDrop: boolean,
   onDragOver: (overIndex: number) => void,
   onDragStart: (index: number) => void,
   onDragEnd: () => void,
 }
 
 const DndTodoItem: FunctionComponent<DndTodoItemProps> = (props) => {
-  const {todo, bucket, index, onDragOver, onDragStart, onDragEnd, isTimeTracked } = props;
+  const {todo, mayDrop, index, onDragOver, onDragStart, onDragEnd, isTimeTracked } = props;
   const [isEditing, setIsEditing] = useState(false);
   return (
     <li 
       draggable={!isEditing}
       onDragEnter={e => {
-        if (e.dataTransfer.getData("text/plain") === bucket) {
-          e.preventDefault();
-          onDragOver(index);
-        }
+        e.preventDefault();
+        if (mayDrop) onDragOver(index);
       }}
-      onDragStart={e => {
-        e.dataTransfer.setData("text/plain", bucket);
+      onDragStart={() => {
         onDragStart(index);
       }}
       onDragEnd={onDragEnd}
