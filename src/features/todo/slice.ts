@@ -66,8 +66,11 @@ export const todoSlice = createSlice({
         }
       }
     },
-    add: (state, action: PayloadAction<{bucket: string, description: string}>) => {
+    append: (state, action: PayloadAction<{bucket: string, description: string}>) => {
       state[action.payload.bucket]?.push(makeTodo(action.payload.description));
+    },
+    prepend: (state, action: PayloadAction<{bucket: string, description: string}>) => {
+      state[action.payload.bucket]?.unshift(makeTodo(action.payload.description));
     },
     remove: (state, action: PayloadAction<string>) => {
       const [name, index] = getTodoLocation(state, action.payload);
@@ -110,6 +113,6 @@ export const todoSlice = createSlice({
   },
 });
 
-export const {add, remove, setDone, setDescription, move, addTime} = todoSlice.actions;
+export const {append, prepend, remove, setDone, setDescription, move, addTime} = todoSlice.actions;
 export type TodoActions = keyof typeof todoSlice.actions;
 export default todoSlice.reducer;
